@@ -3,7 +3,9 @@
  * Supports HttpOnly cookie authentication with Bearer token fallback.
  */
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL || 'http://localhost:5000'
+).replace(/\/+$/, '') + '/api';
 
 /**
  * Enhanced fetch wrapper that handles JSON serialization,
@@ -364,7 +366,7 @@ export const aiApi = {
       data: res?.data || { text: extractedText, topic }
     };
   },
-  extractPdf: async function(formDataOrFile) {
+  extractPdf: async function (formDataOrFile) {
     return this.extractDocument(formDataOrFile);
   },
   simplifyNotes: async ({ text, options }) => {
