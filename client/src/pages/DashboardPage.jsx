@@ -6,7 +6,8 @@ import {
   FileText,
   CheckCircle2,
   Network,
-  GraduationCap
+  GraduationCap,
+  Sparkles
 } from 'lucide-react';
 import { analyticsApi } from '../services/api';
 import AlertBanner from '../components/common/AlertBanner';
@@ -16,7 +17,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
-  const [hoveredTrendIdx, setHoveredTrendIdx] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -37,21 +37,32 @@ export default function DashboardPage() {
   }, []);
 
   const metrics = data?.metrics || {};
-  const quizTrends = data?.quizTrends || [];
   const weakTopics = data?.weakTopics || [];
   const recentActivity = data?.recentActivity || [];
   const recentAttempts = data?.recentAttempts || [];
   const hasAnyData = (metrics.notesSaved || 0) + (metrics.quizzesCompleted || 0) + (metrics.conceptMapsCreated || 0) > 0;
 
+  // Retrieve user's most recently worked-on learning material from server, with fallback
+  const continueLearning = data?.continueLearning || (
+    recentActivity.find(item => item.type === 'note' || item.type === 'concept-map')
+      ? (() => {
+          const item = recentActivity.find(i => i.type === 'note' || i.type === 'concept-map');
+          return {
+            id: item.id,
+            title: item.title,
+            type: item.type,
+            contentType: item.type === 'concept-map' ? 'Concept Map' : (item.title?.toLowerCase().endsWith('.pdf') ? 'PDF Study Material' : 'Simplified Notes'),
+            updatedAt: item.timestamp,
+            link: item.link
+          };
+        })()
+      : null
+  );
+
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
     return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
-
-  // Simple sparkline bar chart for quiz trends
-  const maxTrendPct = quizTrends.length > 0
-    ? Math.max(...quizTrends.map(t => t.percentage || 0), 1)
-    : 100;
 
   return (
     <div className="dashboard-page">
@@ -159,102 +170,82 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Two-column: Quiz Trends + Recent Activity */}
+          {/* Two-column: Continue Learning + Recent Activity */}
           <div className="dashboard-grid">
-            {/* Quiz Score Trends */}
-            <div className="dashboard-card dashboard-card--trends">
+            {/* Continue Learning */}
+            <div className="dashboard-card">
               <div className="dashboard-card-header">
                 <div className="dashboard-card-header-titles">
-                  <h3 className="dashboard-card-title">Quiz Score Trends</h3>
-                  {quizTrends.length > 0 && (
-                    <span className="dashboard-card-subtitle">
-                      {quizTrends.length} {quizTrends.length === 1 ? 'attempt' : 'attempts'}
-                    </span>
+                  <h3 className="dashboard-card-title">Continue Learning</h3>
+                  {continueLearning && (
+                    <span className="dashboard-card-subtitle">Resume your recent material</span>
                   )}
                 </div>
-                {quizTrends.length > 0 && (
-                  <Link to="/insights" className="dashboard-card-link">Full insights →</Link>
-                )}
               </div>
-              <div className="dashboard-card-body dashboard-card-body--trends">
-                {quizTrends.length === 0 ? (
-                  <div className="dashboard-empty dashboard-empty--compact">
-                    <p>Complete your first quiz to see score trends.</p>
-                    <Link to="/quizzes" className="dashboard-empty-action">Generate a Quiz →</Link>
-                  </div>
-                ) : (
-                  <div className="dashboard-trends-container">
-                    <div className="dashboard-trends-chart">
-                      {/* Subtle Y-Axis Grid Lines */}
-                      <div className="dashboard-trends-grid" aria-hidden="true">
-                        <div className="dashboard-trends-grid-row">
-                          <span className="dashboard-trends-grid-label">100%</span>
-                          <div className="dashboard-trends-grid-line" />
-                        </div>
-                        <div className="dashboard-trends-grid-row">
-                          <span className="dashboard-trends-grid-label">50%</span>
-                          <div className="dashboard-trends-grid-line" />
-                        </div>
-                        <div className="dashboard-trends-grid-row">
-                          <span className="dashboard-trends-grid-label">0%</span>
-                          <div className="dashboard-trends-grid-line dashboard-trends-grid-line--base" />
-                        </div>
-                      </div>
-
-                      {/* Bars Plot Area */}
-                      <div className={`dashboard-trends-plot ${quizTrends.length === 1 ? 'dashboard-trends-plot--single' : ''}`}>
-                        {quizTrends.map((trend, idx) => {
-                          const pct = Math.max(Math.min(trend.percentage ?? 0, 100), 4);
-                          const isHovered = hoveredTrendIdx === idx;
-                          return (
-                            <div
-                              key={idx}
-                              className={`dashboard-trend-col ${isHovered ? 'dashboard-trend-col--hovered' : ''}`}
-                              onMouseEnter={() => setHoveredTrendIdx(idx)}
-                              onMouseLeave={() => setHoveredTrendIdx(null)}
-                              tabIndex={0}
-                              role="button"
-                              aria-label={`${trend.title}: ${trend.percentage}% on ${trend.date}`}
-                            >
-                              {/* Interactive Tooltip */}
-                              {isHovered && (
-                                <div className="dashboard-trend-tooltip" role="tooltip">
-                                  <div className="dashboard-trend-tooltip-title">{trend.title || 'Quiz'}</div>
-                                  <div className="dashboard-trend-tooltip-score">
-                                    {trend.score !== undefined && trend.total !== undefined
-                                      ? `${trend.score}/${trend.total} (${trend.percentage}%)`
-                                      : `${trend.percentage}%`}
-                                  </div>
-                                  <div className="dashboard-trend-tooltip-date">{trend.date}</div>
-                                </div>
-                              )}
-
-                              {/* Bar Column Track */}
-                              <div className="dashboard-trend-bar-track">
-                                <div
-                                  className="dashboard-trend-bar-fill"
-                                  style={{ height: `${pct}%` }}
-                                />
-                              </div>
-
-                              {/* Date and Score Labels */}
-                              <div className="dashboard-trend-meta">
-                                <span className="dashboard-trend-pct-label">{trend.percentage}%</span>
-                                <span className="dashboard-trend-date-label">{trend.date}</span>
-                              </div>
-                            </div>
-                          );
-                        })}
+              <div className="dashboard-card-body dashboard-card-body--continue">
+                {continueLearning ? (
+                  <div className="dashboard-continue-card">
+                    <div className="dashboard-continue-header">
+                      <span
+                        className={`dashboard-activity-badge dashboard-activity-badge--${continueLearning.type} flex items-center justify-center`}
+                        aria-hidden="true"
+                      >
+                        {continueLearning.type === 'concept-map' ? (
+                          <Network className="w-4 h-4 text-emerald-700 dark:text-emerald-300" />
+                        ) : (
+                          <FileText className="w-4 h-4 text-brand-700 dark:text-brand-300" />
+                        )}
+                      </span>
+                      <div className="dashboard-continue-meta">
+                        <span className="dashboard-continue-badge">
+                          {continueLearning.contentType || (continueLearning.type === 'concept-map' ? 'Concept Map' : 'Simplified Notes')}
+                        </span>
+                        {continueLearning.updatedAt && (
+                          <span className="dashboard-continue-date">
+                            Last updated {formatDate(continueLearning.updatedAt)}
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    {/* Single Attempt Guidance Note */}
-                    {quizTrends.length === 1 && (
-                      <div className="dashboard-single-trend-note">
-                        <Lightbulb className="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" aria-hidden="true" />
-                        <span>Complete more quizzes to see your progress trend.</span>
-                      </div>
-                    )}
+                    <div className="dashboard-continue-main">
+                      <h4 className="dashboard-continue-title" title={continueLearning.title}>
+                        {continueLearning.title || 'Untitled Material'}
+                      </h4>
+                      <p className="dashboard-continue-desc">
+                        {continueLearning.type === 'concept-map'
+                          ? 'Jump straight back into your interactive nodes and concept relationships.'
+                          : 'Resume reading, audio review, and study takeaways where you left off.'}
+                      </p>
+                    </div>
+
+                    <div className="dashboard-continue-footer">
+                      <Link
+                        to={continueLearning.link}
+                        className="dashboard-continue-btn"
+                      >
+                        <span>Resume Learning</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+                        </svg>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="dashboard-continue-empty">
+                    <div className="dashboard-continue-empty-icon" aria-hidden="true">
+                      <Sparkles className="w-6 h-6 text-brand-600 dark:text-brand-400" />
+                    </div>
+                    <p className="dashboard-continue-empty-title">
+                      Your next learning session starts here
+                    </p>
+                    <p className="dashboard-continue-empty-desc">
+                      Upload study material, simplify notes, or generate concept maps to resume anytime.
+                    </p>
+                    <Link to="/notes" className="dashboard-continue-empty-action">
+                      <span>Explore Study Tools</span>
+                      <span aria-hidden="true">→</span>
+                    </Link>
                   </div>
                 )}
               </div>

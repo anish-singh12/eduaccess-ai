@@ -25,7 +25,8 @@ export async function getDashboardAnalytics(req, res, next) {
           recentActivity: [],
           quizTrends: [],
           weakTopics: [],
-          recentAttempts: []
+          recentAttempts: [],
+          continueLearning: null
         }
       });
     }
@@ -142,6 +143,53 @@ export async function getDashboardAnalytics(req, res, next) {
     activityItems.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     const recentActivity = activityItems.slice(0, 10);
 
+    // Most recently worked-on learning material (Saved Simplified Notes / PDF / Concept Map)
+    const latestDoc = recentDocs[0] || null;
+    const latestMap = recentMaps[0] || null;
+    let continueLearning = null;
+
+    if (latestDoc && latestMap) {
+      const docTime = new Date(latestDoc.updatedAt || latestDoc.createdAt).getTime();
+      const mapTime = new Date(latestMap.updatedAt || latestMap.createdAt).getTime();
+      if (docTime >= mapTime) {
+        continueLearning = {
+          id: latestDoc._id,
+          title: latestDoc.title,
+          type: 'note',
+          contentType: latestDoc.title.toLowerCase().endsWith('.pdf') ? 'PDF Study Material' : 'Simplified Notes',
+          updatedAt: latestDoc.updatedAt || latestDoc.createdAt,
+          link: `/notes?id=${latestDoc._id}`
+        };
+      } else {
+        continueLearning = {
+          id: latestMap._id,
+          title: latestMap.title || `${latestMap.topic} Map`,
+          type: 'concept-map',
+          contentType: 'Concept Map',
+          updatedAt: latestMap.updatedAt || latestMap.createdAt,
+          link: `/concept-maps?id=${latestMap._id}`
+        };
+      }
+    } else if (latestDoc) {
+      continueLearning = {
+        id: latestDoc._id,
+        title: latestDoc.title,
+        type: 'note',
+        contentType: latestDoc.title.toLowerCase().endsWith('.pdf') ? 'PDF Study Material' : 'Simplified Notes',
+        updatedAt: latestDoc.updatedAt || latestDoc.createdAt,
+        link: `/notes?id=${latestDoc._id}`
+      };
+    } else if (latestMap) {
+      continueLearning = {
+        id: latestMap._id,
+        title: latestMap.title || `${latestMap.topic} Map`,
+        type: 'concept-map',
+        contentType: 'Concept Map',
+        updatedAt: latestMap.updatedAt || latestMap.createdAt,
+        link: `/concept-maps?id=${latestMap._id}`
+      };
+    }
+
     res.status(200).json({
       success: true,
       data: {
@@ -152,6 +200,7 @@ export async function getDashboardAnalytics(req, res, next) {
           conceptMapsCreated: mapsCount
         },
         recentActivity,
+        continueLearning,
         quizTrends,
         weakTopics: weakTopics.slice(0, 5),
         recentAttempts: recentAttempts.map(a => ({
