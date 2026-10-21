@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function Navbar() {
   const publicLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Overview', href: '#overview' },
-    { name: 'Dashboard', href: '/dashboard' },
+    { name: 'Dashboard', to: '/dashboard' },
     { name: 'Features', href: '#features' },
     { name: 'About', href: '#accessibility' },
   ];
@@ -93,11 +93,17 @@ export default function Navbar() {
         {/* Center links — landing page: anchor links, authenticated pages: app links */}
         {isLanding ? (
           <nav className="navbar-links" aria-label="Main Navigation">
-            {publicLinks.map((link) => (
-              <a key={link.name} href={link.href} className="navbar-link">
-                {link.name}
-              </a>
-            ))}
+            {publicLinks.map((link) =>
+              link.to ? (
+                <Link key={link.name} to={link.to} className="navbar-link">
+                  {link.name}
+                </Link>
+              ) : (
+                <a key={link.name} href={link.href} className="navbar-link">
+                  {link.name}
+                </a>
+              )
+            )}
           </nav>
         ) : isAuthenticated ? (
           <nav className="navbar-links" aria-label="App Navigation">
@@ -133,7 +139,14 @@ export default function Navbar() {
             )}
           </button>
 
-          {isAuthenticated ? (
+          {loading ? (
+            /* Auth initializing — render reserved-size placeholder to prevent layout shift */
+            <div className="navbar-auth-actions" style={{ minWidth: '120px' }}>
+              <div className="navbar-avatar" style={{ opacity: 0.3 }} aria-hidden="true">
+                <span style={{ visibility: 'hidden' }}>U</span>
+              </div>
+            </div>
+          ) : isAuthenticated ? (
             <div className="navbar-user-menu" ref={menuRef}>
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -219,14 +232,25 @@ export default function Navbar() {
           {isLanding ? (
             <>
               {publicLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="navbar-mobile-link"
-                >
-                  {link.name}
-                </a>
+                link.to ? (
+                  <Link
+                    key={link.name}
+                    to={link.to}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="navbar-mobile-link"
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="navbar-mobile-link"
+                  >
+                    {link.name}
+                  </a>
+                )
               ))}
             </>
           ) : isAuthenticated ? (
@@ -245,7 +269,9 @@ export default function Navbar() {
           ) : null}
 
           <div className="navbar-mobile-divider" />
-          {isAuthenticated ? (
+          {loading ? (
+            <div className="navbar-mobile-link opacity-50 cursor-wait">Loading...</div>
+          ) : isAuthenticated ? (
             <>
               <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="navbar-mobile-link">
                 Settings
