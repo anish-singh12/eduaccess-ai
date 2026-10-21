@@ -23,6 +23,12 @@ export const env = {
   // Frontend Origin for CORS and Cookie Scope
   CLIENT_ORIGIN: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
 
+  // Parsed array of allowed frontend origins (supports comma-separated CLIENT_ORIGINS)
+  CLIENT_ORIGINS: (() => {
+    const origins = process.env.CLIENT_ORIGINS || process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+    return origins.split(',').map(o => o.trim()).filter(Boolean);
+  })(),
+
   // Database URI
   MONGODB_URI: process.env.MONGODB_URI || '',
 

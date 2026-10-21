@@ -19,6 +19,7 @@ async function startServer() {
       logger.info(`  EduAccess AI Server running in [${env.NODE_ENV}] mode`);
       logger.info(`  Port: ${env.PORT}`);
       logger.info(`  Client Origin: ${env.CLIENT_ORIGIN}`);
+      logger.info(`  Allowed Origins: ${env.CLIENT_ORIGINS.join(', ')}`);
       logger.info(`  AI Provider: ${env.AI_PROVIDER || 'none'} (${env.AI_MODEL || 'default'})`);
       logger.info(`  Health Endpoint: http://localhost:${env.PORT}/api/health`);
       logger.info(`=======================================================`);

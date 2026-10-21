@@ -13,7 +13,7 @@ export const helmetMiddleware = helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:"],
-      connectSrc: ["'self'", env.CLIENT_ORIGIN]
+      connectSrc: ["'self'", ...env.CLIENT_ORIGINS]
     }
   } : false, // In development, relaxed for Vite dev server proxy
   crossOriginEmbedderPolicy: false,
@@ -21,23 +21,28 @@ export const helmetMiddleware = helmet({
 });
 
 /**
- * Strict CORS middleware allowing only the configured frontend client origin
+ * Localhost origins always permitted during development.
+ * Production origins come from env.CLIENT_ORIGINS (supports multiple Vercel URLs).
+ */
+const ALLOWED_ORIGINS = new Set([
+  ...env.CLIENT_ORIGINS,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000'
+]);
+
+/**
+ * Strict CORS middleware allowing only the configured frontend client origins
  */
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. same-origin, curl, server-to-server, or mobile apps)
     if (!origin) return callback(null, true);
 
-    // Exact match with configured CLIENT_ORIGIN or localhost during development
-    const allowedOrigins = [
-      env.CLIENT_ORIGIN,
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-      'http://localhost:3000',
-      'http://127.0.0.1:3000'
-    ];
-
-    if (allowedOrigins.includes(origin) || !env.isProduction) {
+    if (ALLOWED_ORIGINS.has(origin) || !env.isProduction) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked: Origin ${origin} is not allowed`));
