@@ -139,12 +139,10 @@ export default function Navbar() {
             )}
           </button>
 
-          {loading ? (
-            /* Auth initializing — render reserved-size placeholder to prevent layout shift */
-            <div className="navbar-auth-actions" style={{ minWidth: '120px' }}>
-              <div className="navbar-avatar" style={{ opacity: 0.3 }} aria-hidden="true">
-                <span style={{ visibility: 'hidden' }}>U</span>
-              </div>
+          {loading && !isAuthenticated ? (
+            /* Auth initializing for unverified session — neutral skeleton to prevent layout shift */
+            <div className="navbar-auth-actions" aria-busy="true" aria-label="Loading authentication">
+              <div className="navbar-auth-skeleton" aria-hidden="true" />
             </div>
           ) : isAuthenticated ? (
             <div className="navbar-user-menu" ref={menuRef}>
@@ -269,8 +267,8 @@ export default function Navbar() {
           ) : null}
 
           <div className="navbar-mobile-divider" />
-          {loading ? (
-            <div className="navbar-mobile-link opacity-50 cursor-wait">Loading...</div>
+          {loading && !isAuthenticated ? (
+            <div className="navbar-mobile-link opacity-50 cursor-wait">Loading account...</div>
           ) : isAuthenticated ? (
             <>
               <Link to="/settings" onClick={() => setMobileMenuOpen(false)} className="navbar-mobile-link">

@@ -28,7 +28,7 @@ function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) {
+  if (loading && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ivory-50 dark:bg-charcoal-950">
         <LoadingSpinner message="Checking authentication status..." />
@@ -49,7 +49,7 @@ function ProtectedRoute({ children }) {
 function PublicOnlyRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
-  if (loading) {
+  if (loading && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ivory-50 dark:bg-charcoal-950">
         <LoadingSpinner message="Loading..." />
