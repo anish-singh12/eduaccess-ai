@@ -259,7 +259,7 @@ export default function SettingsPage() {
                   className={`py-2 text-xs font-bold rounded-xl border transition-all ${
                     fontSize === size.id
                       ? 'bg-forest-600 text-white border-forest-600 shadow-sm'
-                      : 'bg-ivory-50 dark:bg-charcoal-800 text-charcoal-700 dark:text-ivory-100 border-charcoal-200 dark:border-charcoal-700 hover:bg-charcoal-100'
+                      : 'bg-ivory-50 dark:bg-charcoal-800 text-charcoal-700 dark:text-ivory-100 border-charcoal-200 dark:border-charcoal-700 hover:bg-charcoal-100 dark:hover:bg-charcoal-700'
                   }`}
                 >
                   {size.label}
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                   className={`py-2 text-xs font-bold rounded-xl border transition-all ${
                     lineSpacing === lh.id
                       ? 'bg-forest-600 text-white border-forest-600 shadow-sm'
-                      : 'bg-ivory-50 dark:bg-charcoal-800 text-charcoal-700 dark:text-ivory-100 border-charcoal-200 dark:border-charcoal-700 hover:bg-charcoal-100'
+                      : 'bg-ivory-50 dark:bg-charcoal-800 text-charcoal-700 dark:text-ivory-100 border-charcoal-200 dark:border-charcoal-700 hover:bg-charcoal-100 dark:hover:bg-charcoal-700'
                   }`}
                 >
                   {lh.label}

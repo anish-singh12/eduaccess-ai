@@ -188,7 +188,7 @@ export default function QuizTakingView({ quiz, onSubmit, isSubmitting = false })
                     ? 'ring-2 ring-brand-500 bg-brand-600 text-white'
                     : isAnswered
                     ? 'bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300 font-semibold'
-                    : 'bg-charcoal-100 dark:bg-charcoal-800 text-charcoal-500'
+                    : 'bg-charcoal-100 dark:bg-charcoal-800 text-charcoal-500 dark:text-charcoal-400'
                 }`}
               >
                 {idx + 1}

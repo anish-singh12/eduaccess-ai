@@ -23,11 +23,13 @@ import '@xyflow/react/dist/style.css';
 
 import { conceptMapApi, aiApi } from '../services/api';
 import { useDocument } from '../context/DocumentContext';
+import { useTheme } from '../context/ThemeContext';
 import ConceptNode from '../components/conceptMap/ConceptNode';
 import NodeDetailPanel from '../components/conceptMap/NodeDetailPanel';
 import AlertBanner from '../components/common/AlertBanner';
 
 export default function ConceptMapStudioPage() {
+  const { isDark } = useTheme();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const mapId = searchParams.get('id');
@@ -486,28 +488,35 @@ export default function ConceptMapStudioPage() {
             onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             fitView
-            attributionPosition="bottom-left"
+            colorMode={isDark ? 'dark' : 'light'}
+            attributionPosition="bottom-right"
             className="w-full h-full"
           >
-            <Background gap={18} size={1} color="#94a3b8" />
-            <Controls className="bg-white dark:bg-charcoal-800 border border-charcoal-200 dark:border-charcoal-700 rounded-xl shadow-sm" />
+            <Background gap={18} size={1} color={isDark ? '#475569' : '#94a3b8'} />
+            <Controls
+              position="bottom-left"
+              className="react-flow-controls-custom"
+            />
             <MiniMap
               nodeStrokeWidth={3}
               zoomable
               pannable
               className="bg-ivory-50/80 dark:bg-charcoal-800/80 border border-charcoal-200 dark:border-charcoal-700 rounded-xl overflow-hidden shadow-sm"
+              maskColor={isDark ? 'rgba(20, 20, 25, 0.7)' : 'rgba(240, 240, 240, 0.6)'}
             />
           </ReactFlow>
         )}
 
         {/* Selected Node Details Drawer */}
         {selectedNodeData && (
-          <NodeDetailPanel
-            node={selectedNodeData}
-            edges={rawEdgesData.length > 0 ? rawEdgesData : edges}
-            nodes={nodes}
-            onClose={() => setSelectedNodeData(null)}
-          />
+          <div className="absolute top-0 right-0 w-80 md:w-96 h-full z-20 shadow-2xl">
+            <NodeDetailPanel
+              node={selectedNodeData}
+              edges={rawEdgesData.length > 0 ? rawEdgesData : edges}
+              nodes={nodes}
+              onClose={() => setSelectedNodeData(null)}
+            />
+          </div>
         )}
       </div>
 

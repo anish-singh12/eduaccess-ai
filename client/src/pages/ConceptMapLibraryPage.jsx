@@ -152,7 +152,7 @@ export default function ConceptMapLibraryPage() {
               <div className="pt-4 border-t border-charcoal-100 dark:border-charcoal-800 flex items-center justify-between gap-2">
                 <Link
                   to={`/concept-maps?id=${map._id}`}
-                  className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 text-xs font-bold rounded-lg transition-all"
+                  className="px-4 py-1.5 bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900 text-xs font-bold rounded-lg transition-all"
                 >
                   🎨 Open in Canvas
                 </Link>

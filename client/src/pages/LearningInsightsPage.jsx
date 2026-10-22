@@ -20,9 +20,11 @@ import {
   BookOpen
 } from 'lucide-react';
 import { insightApi, aiApi } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
 import AlertBanner from '../components/common/AlertBanner';
 
 export default function LearningInsightsPage() {
+  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -188,7 +190,7 @@ export default function LearningInsightsPage() {
             <div className="h-72 md:h-80 w-full pt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={recentHistory} margin={{ top: 10, right: 30, left: -10, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
+                  <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#334155' : '#e2e8f0'} opacity={0.6} />
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="#64748b" />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} stroke="#64748b" unit="%" />
                   <Tooltip

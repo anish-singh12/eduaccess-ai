@@ -91,7 +91,7 @@ export default function QuizHistoryPage() {
           <button
             type="button"
             onClick={() => setSelectedAttempt(null)}
-            className="px-4 py-2 bg-charcoal-100 dark:bg-charcoal-800 hover:bg-charcoal-200 text-charcoal-800 dark:text-ivory-100 text-xs font-bold rounded-xl transition-all"
+            className="px-4 py-2 bg-charcoal-100 dark:bg-charcoal-800 hover:bg-charcoal-200 dark:hover:bg-charcoal-700 text-charcoal-800 dark:text-ivory-100 text-xs font-bold rounded-xl transition-all"
           >
             ← Back to All Attempts
           </button>
@@ -234,7 +234,7 @@ export default function QuizHistoryPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedAttempt(att)}
-                    className="flex-1 py-2 px-3 bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 hover:bg-teal-100 rounded-xl text-xs font-bold text-center transition-all inline-flex items-center justify-center gap-1.5"
+                    className="flex-1 py-2 px-3 bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900 rounded-xl text-xs font-bold text-center transition-all inline-flex items-center justify-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     <span>Review Breakdown</span>
@@ -249,7 +249,7 @@ export default function QuizHistoryPage() {
                         navigate('/quizzes', { state: { initialTopic: topic } });
                       }
                     }}
-                    className="py-2 px-3 bg-charcoal-100 dark:bg-charcoal-800 hover:bg-charcoal-200 text-charcoal-800 dark:text-ivory-100 rounded-xl text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5"
+                    className="py-2 px-3 bg-charcoal-100 dark:bg-charcoal-800 hover:bg-charcoal-200 dark:hover:bg-charcoal-700 text-charcoal-800 dark:text-ivory-100 rounded-xl text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Retake</span>
