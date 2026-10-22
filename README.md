@@ -67,7 +67,7 @@
 ## 📁 Project Structure
 
 ```
-restaurant-3d-landing/
+eduaccess-ai/
 ├── package.json                 # Root npm workspaces configuration & scripts
 ├── README.md                    # Platform documentation & guides
 ├── .gitignore                   # Workspace gitignore rules
